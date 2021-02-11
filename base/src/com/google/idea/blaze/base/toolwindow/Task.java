@@ -16,6 +16,8 @@
 package com.google.idea.blaze.base.toolwindow;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -24,18 +26,28 @@ public final class Task {
   private final String name;
   private final Type type;
   @Nullable private Task parent;
+  private final List<Task> children;
   private String status = "";
   @Nullable private Instant startTime;
   @Nullable private Instant endTime;
+  private boolean hasErrors;
 
   public Task(String name, Type type) {
     this(name, type, null);
   }
 
   public Task(String name, Type type, @Nullable Task parent) {
+    this(name, type, parent, new ArrayList<>());
+    if (parent != null) {
+      parent.getChildren().add(this);
+    }
+  }
+
+  Task(String name, Type type, @Nullable Task parent, List<Task> children) {
     this.name = name;
     this.type = type;
     this.parent = parent;
+    this.children = children;
   }
 
   String getName() {
@@ -52,6 +64,14 @@ public final class Task {
 
   void setEndTime(Instant endTime) {
     this.endTime = endTime;
+  }
+
+  boolean getHasErrors() {
+    return hasErrors;
+  }
+
+  void setHasErrors(boolean hasErrors) {
+    this.hasErrors = hasErrors;
   }
 
   boolean isFinished() {
@@ -82,6 +102,10 @@ public final class Task {
     return Optional.ofNullable(endTime);
   }
 
+  List<Task> getChildren() {
+    return children;
+  }
+
   /** Type of the task. */
   public enum Type {
     // TODO(olegsa) consider merging some categories
@@ -94,7 +118,8 @@ public final class Task {
     DEPLOYABLE_JAR("DeployableJar"),
     BLAZE_MAKE("Blaze Make"),
     BLAZE_BEFORE_RUN("Blaze Before Run"),
-    BLAZE_SYNC("Blaze Sync");
+    BLAZE_SYNC("Blaze Sync"),
+    OTHER("Other");
 
     private final String displayName;
 

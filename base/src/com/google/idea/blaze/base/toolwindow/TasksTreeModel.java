@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.idea.common.ui.templates;
+package com.google.idea.blaze.base.toolwindow;
 
-import javax.swing.JComponent;
+import com.google.idea.common.ui.properties.Property;
+import java.util.List;
 
-/** The views of the ViewModel architectural pattern should implement this interface. */
-public interface View<C extends JComponent> {
+/** Model for tree of tasks. */
+final class TasksTreeModel {
+  private final List<Task> topLevelTasks;
+  private final Property<Task> selectedTask = new Property<>();
 
-  /** Provides the Swing component that represents the view. */
-  C getComponent();
+  public TasksTreeModel(List<Task> topLevelTasks) {
+    this.topLevelTasks = topLevelTasks;
+  }
+
+  List<Task> getTopLevelTasks() {
+    return topLevelTasks;
+  }
+
+  Property<Task> selectedTaskProperty() {
+    return selectedTask;
+  }
 }
